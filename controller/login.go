@@ -17,7 +17,7 @@ func LoginAuth(ctx *gin.Context) {
 	// 查询数据库中是否有对应的用户字段
 	db.First(&tempUser, user.ID)
 	// 判断用户名及密码是否正确
-	if tempUser.ID == user.ID && common.AesDecrypt(tempUser.Password) == user.Password {
+	if tempUser.Identify == user.Identify && tempUser.ID == user.ID && common.AesDecrypt(tempUser.Password) == user.Password {
 		ctx.JSON(http.StatusOK, gin.H{
 			"code":  "200",
 			"msg":   "认证成功",

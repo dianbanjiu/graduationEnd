@@ -13,7 +13,7 @@ import (
 func GetBoards(ctx *gin.Context) {
 	db := common.GetDB()
 	var boards = make([]model.Board, 0)
-	db.Order("create_at").Limit(5).Find(&boards)
+	db.Order("id").Limit(5).Find(&boards)
 	var boardDto = make([]common.BoardDto, len(boards))
 	for i, v := range boards {
 		boardDto[i] = common.BoardToDto(v)
@@ -38,11 +38,9 @@ func AddBoard(ctx *gin.Context) {
 		return
 	}
 	db := common.GetDB()
-
-	var tempBoard model.Board
-	db.Last(&tempBoard)
-	id, _ := strconv.Atoi(tempBoard.ID)
-	board.ID = strconv.Itoa(id + 1)
+	var count int
+	db.Table("boards").Count(&count)
+	board.ID = strconv.Itoa(count + 1)
 	for i := len(board.ID); i <= 8-len(board.ID); {
 		board.ID = "0" + board.ID
 	}

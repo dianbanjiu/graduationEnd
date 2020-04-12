@@ -15,9 +15,9 @@ type UserDto struct {
 }
 
 type BoardDto struct {
-	ID       string
-	Content  string
-	CreateAt string
+	ID       string	`json:"id" xml:"id" form:"id"`
+	Content  string `json:"content" xml:"content" form:"content"`
+	CreateAt string	`json:"create_at" xml:"create_at" form:"create_at"`
 }
 
 type CourseDto struct {

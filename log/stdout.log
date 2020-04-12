@@ -1,0 +1,31 @@
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] POST   /api/loginAuth            --> graduationEnd/controller.LoginAuth (4 handlers)
+[GIN-debug] POST   /api/admin/addBoard       --> graduationEnd/controller.AddBoard (5 handlers)
+[GIN-debug] POST   /api/admin/deleteBoard    --> graduationEnd/controller.DeleteBoard (5 handlers)
+[GIN-debug] GET    /api/admin/getUsersInfo   --> graduationEnd/controller.GetUsersInfo (5 handlers)
+[GIN-debug] POST   /api/admin/deleteUsers    --> graduationEnd/controller.DeleteUsers (5 handlers)
+[GIN-debug] POST   /api/admin/addUser        --> graduationEnd/controller.AddUser (5 handlers)
+[GIN-debug] POST   /api/admin/addUsers       --> graduationEnd/controller.AddUsers (5 handlers)
+[GIN-debug] POST   /api/admin/deleteCourses  --> graduationEnd/controller.DeleteCourses (5 handlers)
+[GIN-debug] POST   /api/admin/addCourse      --> graduationEnd/controller.AddCourse (5 handlers)
+[GIN-debug] POST   /api/admin/addCourses     --> graduationEnd/controller.AddCourses (5 handlers)
+[GIN-debug] POST   /api/teacher/addBoard     --> graduationEnd/controller.AddBoard (5 handlers)
+[GIN-debug] POST   /api/teacher/deleteBoard  --> graduationEnd/controller.DeleteBoard (5 handlers)
+[GIN-debug] GET    /api/teacher/viewAllPublications --> graduationEnd/controller.ViewAllPublication (5 handlers)
+[GIN-debug] POST   /api/teacher/evaluationAndScore --> graduationEnd/controller.EvaluationAndScore (5 handlers)
+[GIN-debug] POST   /api/teacher/deleteEvaluation --> graduationEnd/controller.DeleteEvaluation (5 handlers)
+[GIN-debug] GET    /api/student/alreadySelectedCourse --> graduationEnd/controller.AlreadySelectedCourse (5 handlers)
+[GIN-debug] POST   /api/student/dropCourse   --> graduationEnd/controller.DropCourse (5 handlers)
+[GIN-debug] POST   /api/student/selectCourse --> graduationEnd/controller.SelectCourse (5 handlers)
+[GIN-debug] POST   /api/student/addPublication --> graduationEnd/controller.AddPublication (5 handlers)
+[GIN-debug] GET    /api/student/viewAllPublications --> graduationEnd/controller.ViewAllPublication (5 handlers)
+[GIN-debug] GET    /api/getUserInfo          --> graduationEnd/controller.GetUserInfo (5 handlers)
+[GIN-debug] GET    /api/getBoards            --> graduationEnd/controller.GetBoards (5 handlers)
+[GIN-debug] POST   /api/changeInfo           --> graduationEnd/controller.ChangeInfo (5 handlers)
+[GIN-debug] GET    /api/getCourses           --> graduationEnd/controller.GetCourses (5 handlers)
+[GIN-debug] Listening and serving HTTP on :9091
