@@ -15,9 +15,9 @@ type UserDto struct {
 }
 
 type BoardDto struct {
-	ID       string	`json:"id" xml:"id" form:"id"`
+	ID       string `json:"id" xml:"id" form:"id"`
 	Content  string `json:"content" xml:"content" form:"content"`
-	CreateAt string	`json:"create_at" xml:"create_at" form:"create_at"`
+	CreateAt string `json:"create_at" xml:"create_at" form:"create_at"`
 }
 
 type CourseDto struct {
@@ -29,7 +29,7 @@ type CourseDto struct {
 	Mentor        string `xml:"mentor" json:"mentor" form:"mentor"`    // 对应的指导教师
 	Count         int    `xml:"count" json:"count" form:"count"`       // 岗位招收人数
 	AlreadySelect int    `xml:"already_select" json:"already_select" form:"already_select"`
-	CreateAt      string	`xml:"create_at" json:"create_at" form:"create_at"`
+	CreateAt      string `xml:"create_at" json:"create_at" form:"create_at"`
 }
 
 // 统一用户返回格式
@@ -57,7 +57,7 @@ func CourseToDto(course model.Course) CourseDto {
 	db := GetDB()
 	db.Model(&model.User{}).Where("select_course= ?", course.ID).Count(&count)
 	var teacher model.User
-	db.Find(&teacher, "id = ?",course.Mentor)
+	db.Find(&teacher, "id = ?", course.Mentor)
 	return CourseDto{
 		ID:            course.ID,
 		Name:          course.Name,

@@ -56,9 +56,9 @@ func DeleteCourses(ctx *gin.Context) {
 
 	// 逐个删除所给的课程
 	db := common.GetDB()
-		if course.ID != "" {
-			db.Delete(&course)
-		}
+	if course.ID != "" {
+		db.Delete(&course)
+	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": "200",

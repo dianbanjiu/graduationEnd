@@ -54,7 +54,7 @@ func StartRouter() {
 		// 为周报评价
 		teacherRoutes.POST("/evaluationAndScore", controller.EvaluationAndScore)
 		// 删除周报评价
-		teacherRoutes.POST("/deleteEvaluation",controller.DeleteEvaluation)
+		teacherRoutes.POST("/deleteEvaluation", controller.DeleteEvaluation)
 	}
 
 	// 学生路由组

@@ -95,8 +95,8 @@ func DeleteUsers(ctx *gin.Context) {
 	var user model.User
 	_ = ctx.Bind(&user)
 	db := common.GetDB()
-		if user.ID != "" {
-			db.Delete(&user)
+	if user.ID != "" {
+		db.Delete(&user)
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": "200",
