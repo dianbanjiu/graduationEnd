@@ -20,7 +20,7 @@ func GetCourses(ctx *gin.Context) {
 	if user.(model.User).Identify == "student" || user.(model.User).Identify == "admin" {
 		db.Find(&courses)
 	} else if user.(model.User).Identify == "teacher" {
-		db.Where("mentor = ?", user.(model.User).Name).Find(&courses)
+		db.Where("mentor = ?", user.(model.User).ID).Find(&courses)
 	}
 
 	// 将返回结果统一格式
@@ -51,16 +51,14 @@ func DeleteCourses(ctx *gin.Context) {
 	}
 
 	// 获取所要删除的课程
-	var courses = make([]model.Course, 0)
-	_ = ctx.Bind(&courses)
+	var course model.Course
+	_ = ctx.Bind(&course)
 
 	// 逐个删除所给的课程
 	db := common.GetDB()
-	for _, c := range courses {
-		if c.ID != "" {
-			db.Delete(&c)
+		if course.ID != "" {
+			db.Delete(&course)
 		}
-	}
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": "200",
@@ -245,7 +243,8 @@ func SelectCourse(ctx *gin.Context) {
 	db.Find(&course, "id = ?", course.ID)
 	var selectedCount int
 	var selectedMem []model.User
-	db.Find(&selectedMem, "select_course = ?", course.ID).Count(&selectedCount)
+	db.Find(&selectedMem, "select_course = ?", course.ID)
+	selectedCount = len(selectedMem)
 	if course.Count-selectedCount <= 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"code": "400",

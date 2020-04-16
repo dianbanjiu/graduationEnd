@@ -37,12 +37,17 @@ func AddPublication(ctx *gin.Context){
 	publication.CreateAt = tn
 	publication.StudentID = user.(model.User).ID
 	publication.CourseID = user.(model.User).SelectCourse
+	publication.StudentName=user.(model.User).Name
+
 
 	db := common.GetDB()
 	var course model.Course
 	db.Find(&course, "id = ?",user.(model.User).SelectCourse)
 	publication.TeacherID = course.Mentor
-	db.Create(&publication)
+	var teacher model.User
+	db.Find(&teacher,"id = ?",publication.TeacherID)
+	publication.TeacherName = teacher.Name
+	db.Save(&publication)
 	ctx.JSON(http.StatusOK,gin.H{
 		"code":"200",
 		"msg":"发布成功",
@@ -56,7 +61,7 @@ func ViewAllPublication(ctx *gin.Context){
 	var publications []model.Publication
 	db := common.GetDB()
 	if identify=="student" {
-		db.Find(&publications, "student_id = ?", user.(model.User).ID)
+		db.Find(&publications, map[string]interface{}{"student_id":user.(model.User).ID,"course_id":user.(model.User).SelectCourse})
 	}else if identify == "teacher" {
 		db.Find(&publications, "teacher_id = ?", user.(model.User).ID)
 	}

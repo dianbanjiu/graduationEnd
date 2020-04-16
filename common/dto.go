@@ -29,7 +29,7 @@ type CourseDto struct {
 	Mentor        string `xml:"mentor" json:"mentor" form:"mentor"`    // 对应的指导教师
 	Count         int    `xml:"count" json:"count" form:"count"`       // 岗位招收人数
 	AlreadySelect int    `xml:"already_select" json:"already_select" form:"already_select"`
-	CreateAt      string
+	CreateAt      string	`xml:"create_at" json:"create_at" form:"create_at"`
 }
 
 // 统一用户返回格式
