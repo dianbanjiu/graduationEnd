@@ -29,3 +29,9 @@
 [GIN-debug] POST   /api/changeInfo           --> graduationEnd/controller.ChangeInfo (5 handlers)
 [GIN-debug] GET    /api/getCourses           --> graduationEnd/controller.GetCourses (5 handlers)
 [GIN-debug] Listening and serving HTTP on :9091
+[GIN] 2020/04/18 - 00:11:37 | 200 |     206.932µs |       127.0.0.1 | OPTIONS  "/api/loginAuth"
+[GIN] 2020/04/18 - 00:11:37 | 200 |    5.067052ms |       127.0.0.1 | POST     "/api/loginAuth"
+[GIN] 2020/04/18 - 00:11:38 | 200 |       6.201µs |       127.0.0.1 | OPTIONS  "/api/getBoards"
+[GIN] 2020/04/18 - 00:11:38 | 200 |    1.352282ms |       127.0.0.1 | GET      "/api/getBoards"
+[GIN] 2020/04/18 - 00:11:41 | 200 |       7.066µs |       127.0.0.1 | OPTIONS  "/api/getBoards"
+[GIN] 2020/04/18 - 00:11:41 | 200 |    1.567854ms |       127.0.0.1 | GET      "/api/getBoards"

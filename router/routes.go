@@ -1,9 +1,15 @@
 package router
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	"graduationEnd/controller"
 	"graduationEnd/middleware"
+	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"time"
 )
 
 func StartRouter() {
@@ -86,5 +92,22 @@ func StartRouter() {
 
 	// 获取实训信息
 	r.GET("/api/getCourses", middleware.AuthMiddleWare(), controller.GetCourses)
-	r.Run(":9091")
+	srv := &http.Server{Addr: ":9091",Handler: r}
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatal("listen: %s\n", err)
+		}
+	}()
+
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	log.Println("shutdown server ...")
+	ctx,cancel := context.WithTimeout(context.Background(),5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatal("Server Shutdown: ", err)
+	}
+	log.Println("server exiting")
+	//r.Run(":9091")
 }
