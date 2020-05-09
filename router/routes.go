@@ -55,6 +55,9 @@ func StartRouter() {
 		// 删除公告
 		teacherRoutes.POST("/deleteBoard", controller.DeleteBoard)
 
+		//查看自己管理实训的所有学生
+		teacherRoutes.GET("/viewAllSelectedStudents", controller.ViewAllSelectedStudents)
+
 		// 查看自己管理的实训的所有学生的周报
 		teacherRoutes.GET("/viewAllPublications", controller.ViewAllPublication)
 		// 为周报评价
@@ -92,10 +95,10 @@ func StartRouter() {
 
 	// 获取实训信息
 	r.GET("/api/getCourses", middleware.AuthMiddleWare(), controller.GetCourses)
-	srv := &http.Server{Addr: ":9091",Handler: r}
+	srv := &http.Server{Addr: ":9091", Handler: r}
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatal("listen: %s\n", err)
+			log.Fatalf("listen: %s\n", err)
 		}
 	}()
 
@@ -103,11 +106,10 @@ func StartRouter() {
 	signal.Notify(quit, os.Interrupt)
 	<-quit
 	log.Println("shutdown server ...")
-	ctx,cancel := context.WithTimeout(context.Background(),5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ctx); err != nil {
 		log.Fatal("Server Shutdown: ", err)
 	}
 	log.Println("server exiting")
-	//r.Run(":9091")
 }

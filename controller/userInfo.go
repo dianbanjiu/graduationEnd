@@ -164,3 +164,25 @@ func AddUsers(ctx *gin.Context) {
 		"msg":  "上传成功",
 	})
 }
+
+func ViewAllSelectedStudents(ctx *gin.Context) {
+	userInfo, _ := ctx.Get("user")
+	db := common.GetDB()
+	var chargeCourse = make([]model.Course, 0)
+	db.Find(&chargeCourse, "mentor = ?", userInfo.(model.User).ID)
+
+	var selectedStudents = make([]model.User, 0)
+	for _, course := range chargeCourse {
+		var sstudent = make([]model.User, 0)
+		db.Find(&sstudent, "select_course = ?", course.ID)
+		selectedStudents = append(selectedStudents, sstudent...)
+	}
+	var studentsInfo = make([]common.UserDto, len(selectedStudents))
+	for i, student := range selectedStudents {
+		studentsInfo[i] = common.UserToDto(student)
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":"200",
+		"msg":studentsInfo,
+	})
+}

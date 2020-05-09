@@ -9,11 +9,38 @@ import (
 	"time"
 )
 
-// 返回最近的5条公告内容
+// 返回公告内容
 func GetBoards(ctx *gin.Context) {
 	db := common.GetDB()
 	var boards = make([]model.Board, 0)
-	db.Order("id").Limit(5).Find(&boards)
+
+	userInfo, _ := ctx.Get("user")
+	switch userInfo.(model.User).Identify {
+	case "admin":
+		db.Find(&boards, "create_identify = ?", "admin")
+		break
+	case "student":
+		var selectedCourse model.Course
+		db.Find(&selectedCourse, "id = ?", userInfo.(model.User).SelectCourse)
+		db.Where("create_by = ?", selectedCourse.Mentor).
+			Or("create_identify = ?", "admin").Find(&boards)
+		break
+	case "teacher":
+		db.Where("create_by = ?", userInfo.(model.User).ID).
+			Or("create_identify = ?", "admin").Find(&boards)
+		break
+	default:
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code": "400",
+			"msg":  "Identify is invalid",
+		})
+		ctx.Abort()
+		return
+	}
+
+	for i := 0; i < len(boards)/2; i++ {
+		boards[i], boards[len(boards)-1-i] = boards[len(boards)-i-1], boards[i]
+	}
 	var boardDto = make([]common.BoardDto, len(boards))
 	for i, v := range boards {
 		boardDto[i] = common.BoardToDto(v)
@@ -32,7 +59,7 @@ func AddBoard(ctx *gin.Context) {
 	if len(board.Content) <= 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
 			"code": "400",
-			"msg":  "添加失败",
+			"msg":  "公告内容不可为空",
 		})
 		ctx.Abort()
 		return
@@ -44,6 +71,9 @@ func AddBoard(ctx *gin.Context) {
 	for i := len(board.ID); i <= 8-len(board.ID); {
 		board.ID = "0" + board.ID
 	}
+	userInfo, _ := ctx.Get("user")
+	board.CreateBy = userInfo.(model.User).ID
+	board.CreateIdentify = userInfo.(model.User).Identify
 	board.CreateAt = time.Now()
 	db.Create(&board)
 	ctx.JSON(http.StatusOK, gin.H{
