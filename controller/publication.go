@@ -65,6 +65,9 @@ func ViewAllPublication(ctx *gin.Context) {
 		db.Find(&publications, "teacher_id = ?", user.(model.User).ID)
 	}
 
+	for i := 0; i < len(publications)/2; i++ {
+		publications[i], publications[len(publications)-i-1] = publications[len(publications)-i-1],publications[i]
+	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": "200",
 		"msg":  publications,
