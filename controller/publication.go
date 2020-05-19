@@ -125,3 +125,29 @@ func DeleteEvaluation(ctx *gin.Context) {
 		"msg":  "删除成功",
 	})
 }
+
+func StudentScoreTimes(ctx *gin.Context){
+	studentId := ctx.Query("student_id")
+	if len(studentId)==0 {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":"401",
+			"msg":"学生ID不可为空",
+		})
+		ctx.Abort()
+		return
+	}
+	db:=common.GetDB()
+	var publications []model.Publication
+	db.Find(&publications, "student_id = ?", studentId)
+	var studentScore = make(map[string]int)
+	for _, publication := range publications {
+		if len(publication.TeacherScore)==0 {
+			continue
+		}
+		studentScore[publication.TeacherScore] += 1
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":"200",
+		"msg":studentScore,
+	})
+}

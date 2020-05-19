@@ -15,9 +15,11 @@ type UserDto struct {
 }
 
 type BoardDto struct {
-	ID       string `json:"id" xml:"id" form:"id"`
-	Content  string `json:"content" xml:"content" form:"content"`
-	CreateAt string `json:"create_at" xml:"create_at" form:"create_at"`
+	ID             string `json:"id" xml:"id" form:"id"`
+	Content        string `json:"content" xml:"content" form:"content"`
+	CreateIdentify string `json:"create_identify" xml:"create_identify" form:"create_identify"`
+	CreateBy       string `json:"create_by" xml:"create_by" form:"create_by"`
+	CreateAt       string `json:"create_at" xml:"create_at" form:"create_at"`
 }
 
 type CourseDto struct {
@@ -46,9 +48,11 @@ func UserToDto(user model.User) UserDto {
 }
 func BoardToDto(board model.Board) BoardDto {
 	return BoardDto{
-		ID:       board.ID,
-		Content:  board.Content,
-		CreateAt: board.CreateAt.Format("2006-01-02"),
+		ID:             board.ID,
+		Content:        board.Content,
+		CreateIdentify: board.CreateIdentify,
+		CreateBy:       board.CreateBy,
+		CreateAt:       board.CreateAt.Format("2006-01-02"),
 	}
 }
 
