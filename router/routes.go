@@ -44,6 +44,11 @@ func StartRouter() {
 		adminRoutes.POST("/addCourse", controller.AddCourse)
 		// 从文件导入多个实训
 		adminRoutes.POST("/addCourses", controller.AddCourses)
+
+		// 查看所有实训申请
+		adminRoutes.GET("/viewAllApplyCourse", controller.ViewAllApplyProgress)
+		// 处理实训申请
+		adminRoutes.POST("/handleApplyCourse",controller.HandleApplyCourse)
 	}
 
 	// 教师路由组
@@ -65,7 +70,12 @@ func StartRouter() {
 		// 删除周报评价
 		teacherRoutes.POST("/deleteEvaluation", controller.DeleteEvaluation)
 		// 查询学生成绩的分布
-		teacherRoutes.GET("studentScoreTimes",controller.StudentScoreTimes)
+		teacherRoutes.GET("/studentScoreTimes",controller.StudentScoreTimes)
+
+		// 查看学生的实训申请
+		teacherRoutes.GET("/viewAllApplyProgress", controller.ViewAllApplyProgress)
+		// 处理实训申请
+		teacherRoutes.POST("/handleApplyCourse", controller.HandleApplyCourse)
 	}
 
 	// 学生路由组
@@ -84,6 +94,10 @@ func StartRouter() {
 		studentRoutes.POST("/addPublication", controller.AddPublication)
 		// 查看自己的所有周报
 		studentRoutes.GET("/viewAllPublications", controller.ViewAllPublication)
+		// 自主申请实训
+		studentRoutes.POST("/applyCourse", controller.ApplyCourse)
+		// 查看申请进度
+		studentRoutes.GET("/viewApplyProgress", controller.ViewApplyProgress)
 	}
 
 	// 个人信息获取

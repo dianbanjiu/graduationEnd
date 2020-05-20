@@ -20,6 +20,8 @@ func init() {
 	db.AutoMigrate(&model.Course{})
 
 	db.AutoMigrate(&model.Publication{})
+
+	db.AutoMigrate(&model.SuggetsCourse{})
 	DB = db
 }
 

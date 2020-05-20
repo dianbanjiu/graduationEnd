@@ -66,7 +66,7 @@ func ViewAllPublication(ctx *gin.Context) {
 	}
 
 	for i := 0; i < len(publications)/2; i++ {
-		publications[i], publications[len(publications)-i-1] = publications[len(publications)-i-1],publications[i]
+		publications[i], publications[len(publications)-i-1] = publications[len(publications)-i-1], publications[i]
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"code": "200",
@@ -126,28 +126,157 @@ func DeleteEvaluation(ctx *gin.Context) {
 	})
 }
 
-func StudentScoreTimes(ctx *gin.Context){
+func StudentScoreTimes(ctx *gin.Context) {
 	studentId := ctx.Query("student_id")
-	if len(studentId)==0 {
+	if len(studentId) == 0 {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"code":"401",
-			"msg":"学生ID不可为空",
+			"code": "401",
+			"msg":  "学生ID不可为空",
 		})
 		ctx.Abort()
 		return
 	}
-	db:=common.GetDB()
+	db := common.GetDB()
 	var publications []model.Publication
 	db.Find(&publications, "student_id = ?", studentId)
 	var studentScore = make(map[string]int)
 	for _, publication := range publications {
-		if len(publication.TeacherScore)==0 {
+		if len(publication.TeacherScore) == 0 {
 			continue
 		}
 		studentScore[publication.TeacherScore] += 1
 	}
 	ctx.JSON(http.StatusOK, gin.H{
+		"code": "200",
+		"msg":  studentScore,
+	})
+}
+
+// 学生查询实训申请进度
+func ViewApplyProgress(ctx *gin.Context) {
+	student, _ := ctx.Get("user")
+	db := common.GetDB()
+	var suggestCourse model.SuggetsCourse
+	db.Not("teacher_status", "2").Not("admin_status", 2).Find(&suggestCourse, "student_id = ?", student.(model.User).ID)
+	if suggestCourse.CourseName=="" {
+		db.Find(&suggestCourse, "student_id = ?", student.(model.User).ID)
+	}
+	if suggestCourse.ID=="" {
+		ctx.JSON(http.StatusNoContent, nil)
+		ctx.Abort()
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":          "200",
+		"suggestCourse": suggestCourse,
+	})
+}
+
+// 学生自主申请实训
+func ApplyCourse(ctx *gin.Context){
+	student, _ := ctx.Get("user")
+	db:=common.GetDB()
+	var suggestCourse model.SuggetsCourse
+	db.Not("teacher_status", "2").Not("admin_status", 2).Find(&suggestCourse, "student_id = ?", student.(model.User).ID)
+	if suggestCourse.CourseName!="" {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":"400",
+			"msg":"尚有课程在申请中，暂不可再次提交申请",
+		})
+		ctx.Abort()
+		return
+	}
+    var selectedCourse model.User
+	db.Find(&selectedCourse, "id = ?", student.(model.User).ID)
+	if selectedCourse.SelectCourse!="" {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":"400",
+			"msg":"已经选课，暂不可提交申请",
+		})
+		ctx.Abort()
+		return
+	}
+	_ = ctx.Bind(&suggestCourse)
+	if suggestCourse.CourseName==""||suggestCourse.MentorID==""||suggestCourse.StudentName==""||
+		suggestCourse.Address==""||suggestCourse.Company==""||suggestCourse.Desc==""||
+		suggestCourse.MentorName==""||suggestCourse.StudentID==""{
+		ctx.JSON(http.StatusBadRequest,gin.H{
+			"code":"400",
+			"msg":"数据不完整，请修改后重新提交",
+		})
+		ctx.Abort()
+		return
+	}
+
+	suggestCourse.ID=student.(model.User).ID+time.Now().Format("20060102")
+	suggestCourse.TeacherStatus="0"
+	suggestCourse.AdminStatus="0"
+	suggestCourse.CreateAt=time.Now()
+	db.Create(&suggestCourse)
+	ctx.JSON(http.StatusOK, gin.H{
 		"code":"200",
-		"msg":studentScore,
+		"msg":"提交成功",
+	})
+}
+
+// 教师/管理员查看学生的实训申请
+func ViewAllApplyProgress(ctx *gin.Context) {
+	user, _ := ctx.Get("user")
+	var suggestCourses []model.SuggetsCourse
+	db := common.GetDB()
+	if user.(model.User).Identify=="teacher" {
+		db.Find(&suggestCourses, "mentor_id = ?", user.(model.User).ID)
+	}else if user.(model.User).Identify == "admin" {
+		db.Not("teacher_status", "0").Find(&suggestCourses)
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":"200",
+		"msg":suggestCourses,
+	})
+}
+
+// 教师/管理员处理学生的实训申请
+func HandleApplyCourse(ctx *gin.Context){
+    user, _ := ctx.Get("user")
+    db := common.GetDB()
+    var suggestCourse model.SuggetsCourse
+	_ = ctx.Bind(&suggestCourse)
+	if suggestCourse.ID=="" {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"code":"400",
+			"msg":"请检查提交项是否完整",
+		})
+		ctx.Abort()
+		return
+	}
+	db.Model(&model.SuggetsCourse{}).Updates(suggestCourse)
+	if user.(model.User).Identify == "admin" && suggestCourse.AdminStatus == "1" {
+		courseId := ctx.Query("courseId")
+		var course = model.Course{
+			ID:       courseId,
+			Name:     suggestCourse.CourseName,
+			Address:  suggestCourse.Address,
+			Desc:     suggestCourse.Desc,
+			Company:  suggestCourse.Company,
+			Mentor:   suggestCourse.MentorID,
+			Count:    1,
+			CreateAt: time.Now(),
+		}
+		var tempCourse model.Course
+		db.Find(&tempCourse, "id= ?", courseId)
+		if tempCourse.Name=="" {
+			db.Save(&course)
+		}else {
+			db.Model(&course).Update("count",tempCourse.Count+1)
+		}
+
+		var student model.User
+		db.Find(&student, "id = ?", suggestCourse.StudentID)
+		db.Model(&student).Update("select_course", courseId)
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"code":"200",
+		"msg":"处理成功",
 	})
 }
