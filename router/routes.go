@@ -46,9 +46,9 @@ func StartRouter() {
 		adminRoutes.POST("/addCourses", controller.AddCourses)
 
 		// 查看所有实训申请
-		adminRoutes.GET("/viewAllApplyCourse", controller.ViewAllApplyProgress)
+		adminRoutes.GET("/viewAllApplyProgress", controller.ViewAllApplyProgress)
 		// 处理实训申请
-		adminRoutes.POST("/handleApplyCourse",controller.HandleApplyCourse)
+		adminRoutes.POST("/handleApplyProgress",controller.HandleApplyCourse)
 	}
 
 	// 教师路由组

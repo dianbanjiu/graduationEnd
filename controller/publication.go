@@ -168,7 +168,7 @@ func ViewApplyProgress(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"code":          "200",
-		"suggestCourse": suggestCourse,
+		"msg": suggestCourse,
 	})
 }
 
@@ -197,9 +197,9 @@ func ApplyCourse(ctx *gin.Context){
 		return
 	}
 	_ = ctx.Bind(&suggestCourse)
-	if suggestCourse.CourseName==""||suggestCourse.MentorID==""||suggestCourse.StudentName==""||
+	if suggestCourse.CourseName==""||suggestCourse.MentorID==""||
 		suggestCourse.Address==""||suggestCourse.Company==""||suggestCourse.Desc==""||
-		suggestCourse.MentorName==""||suggestCourse.StudentID==""{
+		suggestCourse.MentorName==""{
 		ctx.JSON(http.StatusBadRequest,gin.H{
 			"code":"400",
 			"msg":"数据不完整，请修改后重新提交",
@@ -208,6 +208,8 @@ func ApplyCourse(ctx *gin.Context){
 		return
 	}
 
+	suggestCourse.StudentID = student.(model.User).ID
+	suggestCourse.StudentName = student.(model.User).Name
 	suggestCourse.ID=student.(model.User).ID+time.Now().Format("20060102")
 	suggestCourse.TeacherStatus="0"
 	suggestCourse.AdminStatus="0"
@@ -273,7 +275,9 @@ func HandleApplyCourse(ctx *gin.Context){
 
 		var student model.User
 		db.Find(&student, "id = ?", suggestCourse.StudentID)
-		db.Model(&student).Update("select_course", courseId)
+		if student.ID!="" {
+			db.Model(&student).Update("select_course", courseId)
+		}
 	}
 	ctx.JSON(http.StatusOK, gin.H{
 		"code":"200",

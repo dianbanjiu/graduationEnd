@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"strings"
 )
 
 // 获取用户个人信息
@@ -134,6 +135,14 @@ func AddUsers(ctx *gin.Context) {
 	db := common.GetDB()
 	for _, file := range files {
 		dst := path.Join("./tmp/u" + file.Filename)
+		if !strings.Contains(file.Filename,".xlsx") {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"code": "400",
+				"msg":  "文件格式错误",
+			})
+			ctx.Abort()
+			return
+		}
 		_ = ctx.SaveUploadedFile(file, dst)
 		f, _ := xlsx.OpenFile(dst)
 		for _, sheet := range f.Sheets {

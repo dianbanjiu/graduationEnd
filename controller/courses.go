@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 )
 
@@ -109,6 +110,14 @@ func AddCourses(ctx *gin.Context) {
 
 	// 逐个解析文件，并将文件保存到服务器的 /tmp 目录下
 	for _, file := range files {
+		if !strings.Contains(file.Filename,".xlsx") {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"code": "400",
+				"msg":  "文件格式错误",
+			})
+			ctx.Abort()
+			return
+		}
 		dst := path.Join("./tmp/c" + file.Filename)
 		_ = ctx.SaveUploadedFile(file, dst)
 		f, _ := xlsx.OpenFile(dst)
